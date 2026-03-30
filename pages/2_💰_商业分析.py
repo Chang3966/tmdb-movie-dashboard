@@ -6,9 +6,14 @@ import os
 
 # 确保能正确导入上一级目录的 data_utils
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from data_utils import load_data, render_sidebar
+from data_utils import load_data, render_sidebar, apply_apple_glass_style
 
 st.set_page_config(page_title="商业分析", page_icon="💰", layout="wide")
+
+# ====================================================
+# ✨ 注入 Apple 毛玻璃液态框全局样式
+# ====================================================
+apply_apple_glass_style()
 
 # 加载数据与侧边栏
 with st.spinner('正在加载数据缓存...'):
@@ -29,9 +34,11 @@ if not df_finance_filtered.empty:
     fig_scatter = px.scatter(
         df_finance_filtered, x="budget", y="revenue", 
         hover_data=['title', 'release_year'], color="vote_average",
-        color_continuous_scale="Viridis",
+        color_continuous_scale="Hot", # 修改为 Hot 配色，科技感发光效果
         labels={"budget": "预算 ($)", "revenue": "票房 ($)", "vote_average": "评分"}
     )
+    # 让图表背景透明，完美融入毛玻璃卡片
+    fig_scatter.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig_scatter, use_container_width=True)
 else:
     st.info("所选年份区间内缺乏有效的财务数据。")
@@ -46,13 +53,13 @@ with col_left:
     tab1, tab2 = st.tabs(["最高票房 Top 10", "最受欢迎 Top 10"])
     with tab1:
         top_rev = df_filtered.sort_values(by="revenue", ascending=False).head(10)
-        fig_rev = px.bar(top_rev, x="revenue", y="title", orientation='h', color="revenue")
-        fig_rev.update_layout(yaxis={'categoryorder':'total ascending'})
+        fig_rev = px.bar(top_rev, x="revenue", y="title", orientation='h', color="revenue", color_continuous_scale="Plasma")
+        fig_rev.update_layout(yaxis={'categoryorder':'total ascending'}, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig_rev, use_container_width=True)
     with tab2:
         top_pop = df_filtered.sort_values(by="popularity", ascending=False).head(10)
-        fig_pop = px.bar(top_pop, x="popularity", y="title", orientation='h', color="popularity", color_continuous_scale="Reds")
-        fig_pop.update_layout(yaxis={'categoryorder':'total ascending'})
+        fig_pop = px.bar(top_pop, x="popularity", y="title", orientation='h', color="popularity", color_continuous_scale="Plasma")
+        fig_pop.update_layout(yaxis={'categoryorder':'total ascending'}, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig_pop, use_container_width=True)
 
 with col_right:
@@ -69,7 +76,7 @@ with col_right:
             color="roi_pct", color_continuous_scale="Greens",
             hover_data=['title', 'budget', 'revenue', 'profit']
         )
-        fig_roi.update_layout(yaxis={'categoryorder':'total ascending'})
+        fig_roi.update_layout(yaxis={'categoryorder':'total ascending'}, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig_roi, use_container_width=True)
 
 st.markdown("---")
@@ -94,6 +101,7 @@ with tab_studio:
             color='avg_rating', color_continuous_scale='RdYlBu',
             labels={'production_companies': '制作公司', 'total_revenue': '总票房 ($)', 'avg_rating': '平均评分'}
         )
+        fig_studios.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig_studios, use_container_width=True)
 
 with tab_map:
@@ -105,5 +113,8 @@ with tab_map:
             country_counts, locations="Country", locationmode="country names",
             color="Movie Count", hover_name="Country", color_continuous_scale="YlGnBu"
         )
-        fig_map.update_layout(geo=dict(showframe=False, showcoastlines=True, projection_type='equirectangular'))
+        fig_map.update_layout(
+            geo=dict(showframe=False, showcoastlines=True, projection_type='equirectangular', bgcolor='rgba(0,0,0,0)'),
+            paper_bgcolor="rgba(0,0,0,0)", margin={"r":0,"t":40,"l":0,"b":0}
+        )
         st.plotly_chart(fig_map, use_container_width=True)
