@@ -1,17 +1,32 @@
 import streamlit as st
 import plotly.express as px
-from data_utils import load_data, render_sidebar # 导入共享工具
+import sys
+import os
+
+# 确保能正确导入上一级目录的 data_utils
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from data_utils import load_data, render_sidebar, apply_apple_glass_style # 导入新函数
 
 st.set_page_config(page_title="数据概览", page_icon="📊", layout="wide")
 
-# 加载数据和侧边栏
+# 加载数据与侧边栏
 with st.spinner('正在加载数据缓存...'):
-    df, df_finance = load_data()
+    df, _ = load_data()
 selected_years = render_sidebar(df)
 
-# 根据侧边栏过滤数据
+# 应用过滤
 df_filtered = df[(df['release_year'] >= selected_years[0]) & (df['release_year'] <= selected_years[1])]
 
+# ====================================================
+# ✨ 第 1 步：子页面也必须一键全局美容！
+# ====================================================
+apply_apple_glass_style()
+
+st.header("📊 数据概览")
+col1, col2, col3, col4 = st.columns(4)
+
+# (继续之前的图表绘制和指标展示代码...)
+# ...
 st.header("📊 数据概览")
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("总电影数", f"{len(df_filtered):,}")
