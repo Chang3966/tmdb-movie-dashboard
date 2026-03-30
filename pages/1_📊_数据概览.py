@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd     # ✨ 加上这一行！让 Python 认识 pd
 import plotly.express as px
 import sys
 import os
@@ -41,3 +42,39 @@ st.subheader("📈 历年电影发行趋势")
 movies_per_year = df_filtered.groupby('release_year').size().reset_index(name='count')
 fig_trend = px.line(movies_per_year, x="release_year", y="count", markers=True)
 st.plotly_chart(fig_trend, use_container_width=True)
+
+
+# st.markdown("---")
+# st.header("💯 满分神作 (评分 10.0)")
+# st.markdown("在庞大的片库中，能拿到满分 10.0 的往往是特定粉丝群体的狂欢或是极具特色的隐藏神作。我们为您提取了当前年份区间内**热度最高**的 10 部满分影片：")
+
+# # 1. 筛选评分为 10.0 的电影
+# df_perfect = df_filtered[df_filtered['vote_average'] == 10.0]
+
+# if not df_perfect.empty:
+#     # 2. 按受欢迎程度 (popularity) 和 投票人数 (vote_count) 降序排列，取前 10 名
+#     if 'vote_count' in df_perfect.columns:
+#         top_perfect = df_perfect.sort_values(by=['popularity', 'vote_count'], ascending=[False, False]).head(10)
+#     else:
+#         top_perfect = df_perfect.sort_values(by='popularity', ascending=False).head(10)
+    
+#     # 3. 采用 5 列海报画廊布局展示
+#     cols = st.columns(5)
+#     for i, (_, row) in enumerate(top_perfect.iterrows()):
+#         with cols[i % 5]: # 使用取余数的方式，让 10 部电影完美分配到两行（每行 5 个）
+#             if pd.notna(row.get('poster_path')):
+#                 poster_url = f"https://image.tmdb.org/t/p/w500{row['poster_path']}"
+#                 st.image(poster_url, use_container_width=True)
+#             else:
+#                 # 如果没有海报，占位显示
+#                 st.info("🚫 暂无海报")
+            
+#             # 显示精简的电影信息
+#             st.markdown(f"**{row['title']}**")
+            
+#             # 安全地读取年份和投票人数
+#             release_year = str(row['release_date'])[:4] if pd.notna(row.get('release_date')) else '未知'
+#             vote_info = f" | 👤 {int(row['vote_count'])}票" if 'vote_count' in row and pd.notna(row['vote_count']) else ""
+#             st.caption(f"📅 {release_year}{vote_info}")
+# else:
+#     st.info("💡 在当前选定的年份区间内，没有找到评分为 10.0 的电影哦。尝试在左侧边栏拉大年份范围看看！")
