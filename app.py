@@ -1,6 +1,16 @@
 import streamlit as st
+import sys
+import os
 
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+from data_utils import load_data, render_sidebar, apply_apple_glass_style # 导入新函数
+# 全局页面配置 (font 部分不再需要，CSS 里有全局强制)
 st.set_page_config(page_title="TMDB 数据看板", page_icon="🎬", layout="wide")
+
+# ====================================================
+# ✨ 第 1 步：一键全局注入 Apple 液态玻璃框美容代码！
+# ====================================================
+apply_apple_glass_style()
 
 st.title("🎬 欢迎来到 TMDB 电影数据分析系统")
 st.markdown("---")
