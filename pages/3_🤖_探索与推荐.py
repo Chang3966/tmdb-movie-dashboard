@@ -9,9 +9,14 @@ import os
 
 # 确保能正确导入上一级目录的 data_utils
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from data_utils import load_data, render_sidebar
+from data_utils import load_data, render_sidebar, apply_apple_glass_style
 
 st.set_page_config(page_title="探索与推荐", page_icon="🤖", layout="wide")
+
+# ====================================================
+# ✨ 注入 Apple 毛玻璃液态框全局样式
+# ====================================================
+apply_apple_glass_style()
 
 # 加载数据与侧边栏
 with st.spinner('正在加载数据缓存...'):
@@ -58,6 +63,7 @@ with col_left:
     st.header("✨ AI 智能推荐系统")
     st.markdown("基于 TF-IDF 和余弦相似度，寻找在类型、关键词和剧情上最匹配的电影。")
     
+    # 扩大推荐池到 20000 部电影
     df_rec = df_filtered.dropna(subset=['title', 'overview']).sort_values('popularity', ascending=False).head(20000).reset_index(drop=True)
     if not df_rec.empty:
         df_rec['combined_features'] = df_rec['genres'].fillna('') + ' ' + df_rec['keywords'].fillna('') + ' ' + df_rec['overview'].fillna('')
@@ -93,11 +99,14 @@ with col_right:
     if not top_popular.empty:
         movie_pop_dict = dict(zip(top_popular['title'], top_popular['popularity']))
         wordcloud = WordCloud(
-            width=600, height=800, background_color='white',
-            colormap='magma', max_words=80
+            width=600, height=800, background_color='rgba(255, 255, 255, 0)', # 词云背景透明化，适配毛玻璃卡片
+            mode='RGBA', colormap='magma', max_words=80
         ).generate_from_frequencies(movie_pop_dict)
         
+        # 将 matplotlib 图表背景设为透明
         fig_wc, ax = plt.subplots(figsize=(6, 8))
+        fig_wc.patch.set_alpha(0)
+        ax.patch.set_alpha(0)
         ax.imshow(wordcloud, interpolation='bilinear')
         ax.axis('off')
         st.pyplot(fig_wc)
