@@ -58,7 +58,7 @@ with col_left:
     st.header("✨ AI 智能推荐系统")
     st.markdown("基于 TF-IDF 和余弦相似度，寻找在类型、关键词和剧情上最匹配的电影。")
     
-    df_rec = df_filtered.dropna(subset=['title', 'overview']).sort_values('popularity', ascending=False).head(10000).reset_index(drop=True)
+    df_rec = df_filtered.dropna(subset=['title', 'overview']).sort_values('popularity', ascending=False).head(20000).reset_index(drop=True)
     if not df_rec.empty:
         df_rec['combined_features'] = df_rec['genres'].fillna('') + ' ' + df_rec['keywords'].fillna('') + ' ' + df_rec['overview'].fillna('')
         movie_list = df_rec['title'].tolist()
