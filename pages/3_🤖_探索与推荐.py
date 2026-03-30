@@ -22,6 +22,8 @@ apply_apple_glass_style()
 with st.spinner('正在加载数据缓存...'):
     df, _ = load_data()
 selected_years = render_sidebar(df)
+
+# 应用过滤
 df_filtered = df[(df['release_year'] >= selected_years[0]) & (df['release_year'] <= selected_years[1])]
 
 st.title("🤖 探索影片与 AI 智能推荐")
@@ -103,7 +105,7 @@ with col_right:
             mode='RGBA', colormap='magma', max_words=80
         ).generate_from_frequencies(movie_pop_dict)
         
-        # 将 matplotlib 图表背景设为透明
+        # 将 matplotlib 图表背景设为透明，完美融入毛玻璃特效
         fig_wc, ax = plt.subplots(figsize=(6, 8))
         fig_wc.patch.set_alpha(0)
         ax.patch.set_alpha(0)
