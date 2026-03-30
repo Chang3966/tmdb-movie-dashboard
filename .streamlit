@@ -1,0 +1,9 @@
+[theme]
+# 设置全局字体为无衬线字体 (如 Apple SF Pro)
+font = "sans serif"
+
+# 极简配色系统 (macOS Light Mode)
+primaryColor = "#007AFF" # Apple 经典科技蓝
+backgroundColor = "#FDFDFD" # 极浅、干净的白色底色
+secondaryBackgroundColor = "#F5F5F7" # 极浅、温和的灰色底色 (用于侧边栏和卡片背景)
+textColor = "#1D1D1F" # 非常深的灰色 (不是纯黑，更高级)
