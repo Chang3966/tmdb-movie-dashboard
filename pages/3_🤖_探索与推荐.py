@@ -21,10 +21,8 @@ apply_apple_glass_style()
 # 加载数据与侧边栏
 with st.spinner('正在加载数据缓存...'):
     df, _ = load_data()
-selected_years = render_sidebar(df)
-
-# 应用过滤
-df_filtered = df[(df['release_year'] >= selected_years[0]) & (df['release_year'] <= selected_years[1])]
+# 现在侧边栏直接吐出过滤好的完美数据！
+df_filtered = render_sidebar(df)
 
 st.title("🤖 探索影片与 AI 智能推荐")
 st.markdown("搜寻您喜爱的经典电影，或者让我们的机器学习算法为您推荐下一部值得一看的佳作。")
