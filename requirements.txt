@@ -8,3 +8,5 @@ networkx
 pyvis
 nltk
 networkx
+textblob
+google-generativeai
