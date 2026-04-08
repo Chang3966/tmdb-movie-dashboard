@@ -4,7 +4,7 @@ import pandas as pd
 @st.cache_data
 def load_data():
     # 修改为：
-    df = pd.read_csv("TMDB_small.csv")
+    df = pd.read_csv("TMDB_small.csv.gz")
     df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
     df['release_year'] = df['release_date'].dt.year
     df_finance = df[(df['revenue'] > 0) & (df['budget'] > 0)].copy()
