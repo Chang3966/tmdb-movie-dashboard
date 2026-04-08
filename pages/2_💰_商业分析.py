@@ -18,11 +18,11 @@ apply_apple_glass_style()
 # 加载数据与侧边栏
 with st.spinner('正在加载数据缓存...'):
     df, df_finance = load_data()
-selected_years = render_sidebar(df)
+# 1. 直接接收过滤好的核心数据
+df_filtered = render_sidebar(df)
 
-# 应用过滤
-df_filtered = df[(df['release_year'] >= selected_years[0]) & (df['release_year'] <= selected_years[1])]
-df_finance_filtered = df_finance[(df_finance['release_year'] >= selected_years[0]) & (df_finance['release_year'] <= selected_years[1])]
+# 2. 让财务数据跟随核心数据同步过滤 (只保留在 df_filtered 中存活下来的电影)
+df_finance_filtered = df_finance[df_finance.index.isin(df_filtered.index)]
 
 st.title("💰 商业与产业分析")
 st.markdown("深度挖掘票房背后的秘密，分析各大制片厂的表现与全球电影产业分布。")
