@@ -13,10 +13,8 @@ st.set_page_config(page_title="数据概览", page_icon="📊", layout="wide")
 # 加载数据与侧边栏
 with st.spinner('正在加载数据缓存...'):
     df, _ = load_data()
-selected_years = render_sidebar(df)
-
-# 应用过滤
-df_filtered = df[(df['release_year'] >= selected_years[0]) & (df['release_year'] <= selected_years[1])]
+# 现在侧边栏直接吐出过滤好的完美数据！
+df_filtered = render_sidebar(df)
 
 # ====================================================
 # ✨ 第 1 步：子页面也必须一键全局美容！
@@ -42,6 +40,14 @@ st.subheader("📈 历年电影发行趋势")
 movies_per_year = df_filtered.groupby('release_year').size().reset_index(name='count')
 fig_trend = px.line(movies_per_year, x="release_year", y="count", markers=True)
 st.plotly_chart(fig_trend, use_container_width=True)
+st.markdown("---")
+
+st.header("🎭 电影剧情情感演变趋势")
+# 按年份分组计算平均情感得分
+sentiment_trend = df_filtered.groupby('release_year')['sentiment'].mean().reset_index()
+fig_sent = px.line(sentiment_trend, x='release_year', y='sentiment', title="电影剧情从‘悲伤/黑暗’到‘积极/光明’的演变")
+st.plotly_chart(fig_sent, use_container_width=True)
+
 
 
 st.markdown("---")
