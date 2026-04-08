@@ -11,15 +11,35 @@ def load_data():
     return df, df_finance
 
 def render_sidebar(df):
-    st.sidebar.header("⚙️ 全局过滤条件")
-    min_year = int(df['release_year'].min()) if pd.notna(df['release_year'].min()) else 1900
-    max_year = int(df['release_year'].max()) if pd.notna(df['release_year'].max()) else 2024
+    st.sidebar.header("🎛️ 筛选控制中心")
     
-    selected_years = st.sidebar.slider(
-        "选择电影上映年份区间",
-        min_value=min_year, max_value=max_year, value=(2000, max_year)
-    )
-    return selected_years
+    # 1. 年份筛选
+    min_year, max_year = int(df['release_year'].min()), int(df['release_year'].max())
+    year_range = st.sidebar.slider("上映年份范围", min_year, max_year, (2000, max_year))
+    
+    # 2. 类型筛选 (处理多标签)
+    all_genres = set()
+    df['genres'].dropna().str.split(',').apply(lambda x: [all_genres.add(g.strip()) for g in x])
+    selected_genres = st.sidebar.multiselect("电影类型", sorted(list(all_genres)), default=[])
+    
+    # 3. 语言筛选
+    top_languages = df['original_language'].value_counts().head(10).index.tolist()
+    selected_langs = st.sidebar.multiselect("原声语言 (Top 10)", sorted(top_languages), default=[])
+    
+    # 4. 最低评分筛选
+    min_score = st.sidebar.number_input("最低评分要求", 0.0, 10.0, 0.0, step=0.5)
+
+    # 封装过滤逻辑
+    mask = (df['release_year'] >= year_range[0]) & (df['release_year'] <= year_range[1]) & (df['vote_average'] >= min_score)
+    
+    if selected_genres:
+        mask &= df['genres'].apply(lambda x: any(g in str(x) for g in selected_genres) if pd.notna(x) else False)
+    
+    if selected_langs:
+        mask &= df['original_language'].isin(selected_langs)
+        
+    return df[mask]
+
 
 def apply_apple_glass_style():
     """
