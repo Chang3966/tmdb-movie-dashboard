@@ -21,6 +21,7 @@ apply_apple_glass_style()
 # 加载数据与侧边栏
 with st.spinner('正在加载数据缓存...'):
     df, _ = load_data()
+
 # 现在侧边栏直接吐出过滤好的完美数据！
 df_filtered = render_sidebar(df)
 
@@ -28,7 +29,9 @@ st.title("🤖 探索影片与 AI 智能推荐")
 st.markdown("搜寻您喜爱的经典电影，或者让我们的机器学习算法为您推荐下一部值得一看的佳作。")
 st.markdown("---")
 
-# 模块 1：带有海报的迷你搜索引擎
+# ====================================================
+# 🔍 模块 1：带有海报的迷你搜索引擎
+# ====================================================
 st.header("🔍 电影资料库检索")
 search_query = st.text_input("输入电影名称的关键词 (如: Inception, Matrix, Titanic)：", "")
 
@@ -41,7 +44,7 @@ if search_query:
             with col1:
                 if pd.notna(row['poster_path']):
                     poster_url = f"https://image.tmdb.org/t/p/w500{row['poster_path']}"
-                    st.image(poster_url, use_column_width=True)
+                    st.image(poster_url, use_container_width=True)
                 else:
                     st.info("🚫 暂无海报")
             with col2:
@@ -56,7 +59,9 @@ if search_query:
 
 st.markdown("---")
 
-# 模块 2：AI 推荐系统 & 词云 (左右布局)
+# ====================================================
+# ✨ 模块 2：AI 推荐系统 & 词云 (左右布局)
+# ====================================================
 col_left, col_right = st.columns([2, 1])
 
 with col_left:
@@ -71,24 +76,59 @@ with col_left:
         selected_movie = st.selectbox("请在下拉框中选择一部您喜欢的电影：", ["-- 请选择 --"] + movie_list)
 
         if selected_movie != "-- 请选择 --":
-            with st.spinner('AI 正在计算全库特征矩阵相似度...'):
+            with st.spinner('⏳ AI 正在深度解析剧情与特征矩阵...'):
                 tfidf = TfidfVectorizer(stop_words='english')
                 tfidf_matrix = tfidf.fit_transform(df_rec['combined_features'])
+                
+                # 获取目标电影的索引和基础特征（用于提取推荐理由）
                 idx = df_rec[df_rec['title'] == selected_movie].index[0]
+                source_movie = df_rec.iloc[idx]
+                
+                # 辅助函数：提取电影的类型标签
+                def get_genres_set(genres_str):
+                    if pd.isna(genres_str) or not genres_str: return set()
+                    return set([g.strip() for g in str(genres_str).split(',')])
+                
+                source_genres = get_genres_set(source_movie.get('genres'))
+                
+                # 计算余弦相似度
                 sim_scores = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
+                # 取出前 6 个（第 1 个是自己，所以取 -6:-1 并倒序）
                 top_indices = sim_scores.argsort()[-6:-1][::-1]
                 
-                st.success(f"为您找到 5 部与《{selected_movie}》高度相似的影片：")
+                st.success(f"基于您的口味，AI 强烈推荐以下 5 部影片：")
                 cols = st.columns(5)
+                
                 for i, c in enumerate(cols):
                     rec_idx = top_indices[i]
                     rec_movie = df_rec.iloc[rec_idx]
+                    
+                    # 🎯 核心升级 1：提取共性标签作为“推荐理由”
+                    rec_genres = get_genres_set(rec_movie.get('genres'))
+                    common_genres = list(source_genres.intersection(rec_genres))
+                    
+                    # 取前两个共同标签展示，如果没有共同标签则显示综合剧情
+                    if common_genres:
+                        reason_text = "、".join(common_genres[:2])
+                    else:
+                        reason_text = "综合剧情相似"
+                    
+                    # 🎯 核心升级 2：将小数转换为直观的百分比
+                    match_percentage = int(sim_scores[rec_idx] * 100)
+                    
                     with c:
+                        # 渲染海报
                         if pd.notna(rec_movie.get('poster_path')):
                             poster_url = f"https://image.tmdb.org/t/p/w500{rec_movie['poster_path']}"
-                            st.image(poster_url, use_column_width=True)
-                        st.write(f"**{rec_movie['title']}**")
-                        st.caption(f"相似度: {sim_scores[rec_idx]:.2f}")
+                            st.image(poster_url, use_container_width=True)
+                        else:
+                            st.image("https://via.placeholder.com/500x750?text=No+Poster", use_container_width=True)
+                            
+                        # 渲染信息（精简排版以适应窄列）
+                        st.markdown(f"**{rec_movie['title']}**")
+                        st.caption(f"🔥 **匹配度: {match_percentage}%**")
+                        st.caption(f"💡 因您喜欢: *{reason_text}*")
+                        
     else:
          st.info("数据量不足，无法初始化推荐引擎。")
 

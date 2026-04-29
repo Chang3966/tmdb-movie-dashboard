@@ -42,17 +42,17 @@ fig_trend = px.line(movies_per_year, x="release_year", y="count", markers=True)
 st.plotly_chart(fig_trend, use_container_width=True)
 st.markdown("---")
 
-st.header("🎭 电影剧情情感演变趋势")
-# 按年份分组计算平均情感得分
-sentiment_trend = df_filtered.groupby('release_year')['sentiment'].mean().reset_index()
-fig_sent = px.line(sentiment_trend, x='release_year', y='sentiment', title="电影剧情从‘悲伤/黑暗’到‘积极/光明’的演变")
-st.plotly_chart(fig_sent, use_container_width=True)
+# st.header("🎭 电影剧情情感演变趋势")
+# # 按年份分组计算平均情感得分
+# sentiment_trend = df_filtered.groupby('release_year')['sentiment'].mean().reset_index()
+# fig_sent = px.line(sentiment_trend, x='release_year', y='sentiment', title="电影剧情从‘悲伤/黑暗’到‘积极/光明’的演变")
+# st.plotly_chart(fig_sent, use_container_width=True)
 
 
 
-st.markdown("---")
-st.header("💯 高分神作 (评分 8.0+)")
-st.markdown("在庞大的片库中，能拿到高分 8.0 以上的往往是特定粉丝群体的狂欢或是极具特色的隐藏神作。我们为您提取了当前年份区间内**热度最高**的 10 部满分影片：")
+# st.markdown("---")
+st.header("💯 高分神作")
+st.markdown("在庞大的片库中，能拿到高分的往往是特定粉丝群体的狂欢或是极具特色的隐藏神作。我们为您提取了当前年份区间内**热度最高**的 10 部满分影片：")
 
 # 1. 筛选评分为 8.0 及以上的电影
 df_perfect = df_filtered[df_filtered['vote_average'] >= 8.0]

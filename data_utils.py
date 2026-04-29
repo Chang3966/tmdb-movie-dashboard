@@ -1,13 +1,19 @@
 import streamlit as st
 import pandas as pd
 
-@st.cache_data
+# 🚀 核心提速魔法升级：设定 1 小时过期，并关闭默认加载圈（让位给我们自定义的优雅动画）
+@st.cache_data(ttl=3600, show_spinner=False)
 def load_data():
-    # 修改为：
+    # 读取极速压缩包
     df = pd.read_csv("TMDB_small.csv.gz")
+    
+    # 预处理年份数据
     df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
     df['release_year'] = df['release_date'].dt.year
+    
+    # 预处理财务数据（过滤掉没有票房和预算的无效数据）
     df_finance = df[(df['revenue'] > 0) & (df['budget'] > 0)].copy()
+    
     return df, df_finance
 
 def render_sidebar(df):
@@ -39,7 +45,6 @@ def render_sidebar(df):
         mask &= df['original_language'].isin(selected_langs)
         
     return df[mask]
-
 
 def apply_apple_glass_style():
     """
